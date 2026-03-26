@@ -22,7 +22,7 @@ body {
   color:white;
 }
 
-/* 🔮 FULLSCREEN LOADER */
+/* 🔮 LOADER */
 #loader {
   position:fixed;
   top:0;
@@ -52,17 +52,15 @@ body {
   margin-top:15px;
   font-size:20px;
   color:black;
-  letter-spacing:2px;
 }
 
-/* glow animation */
 @keyframes pulse {
-  0% { transform:scale(1); filter:drop-shadow(0 0 0px #000); }
-  50% { transform:scale(1.1); filter:drop-shadow(0 0 25px #888); }
-  100% { transform:scale(1); filter:drop-shadow(0 0 0px #000); }
+  0% { transform:scale(1); }
+  50% { transform:scale(1.1); }
+  100% { transform:scale(1); }
 }
 
-/* 📦 MAIN UI */
+/* 📦 MAIN */
 .container {
   width:95%;
   max-width:500px;
@@ -87,7 +85,6 @@ body {
 
 #walletStatus {
   text-align:center;
-  font-size:18px;
 }
 
 .balance {
@@ -101,32 +98,55 @@ body {
   margin:10px 0;
   cursor:pointer;
 }
-.menu div:hover{ text-decoration:underline; }
 
 h2 {
-  font-size:28px;
   margin-top:40px;
 }
 
+/* accordion */
 .accordion-header {
   display:flex;
   justify-content:space-between;
+  align-items:center;
   cursor:pointer;
+}
+
+.accordion-icon {
+  transition:transform 0.3s ease;
+}
+
+.accordion-item.active .accordion-icon {
+  transform:rotate(45deg);
 }
 
 .accordion-content{
   max-height:0;
   overflow:hidden;
   opacity:0;
-  transition:0.3s;
+  transform:translateY(-5px);
+  transition:all 0.35s ease;
 }
 
 .accordion-item.active .accordion-content{
   max-height:500px;
   opacity:1;
-  margin-top:6px;
+  transform:translateY(0);
+  margin-top:8px;
 }
 
+/* row layout */
+.row {
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.row .accordion-item {
+  flex:1;
+  min-width:48%;
+}
+
+/* glass */
 .liquid {
   background:rgba(255,255,255,0.08);
   backdrop-filter:blur(25px);
@@ -135,7 +155,13 @@ h2 {
   margin-top:10px;
 }
 
-input{
+.subtle-text {
+  opacity:0.6;
+  font-size:15px;
+}
+
+/* inputs */
+input, button {
   width:100%;
   padding:10px;
   margin-top:10px;
@@ -143,15 +169,9 @@ input{
   border-radius:8px;
 }
 
-button{
-  width:100%;
-  padding:10px;
-  margin-top:10px;
+button {
   background:white;
   color:black;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
 }
 
 .address {
@@ -163,21 +183,17 @@ button{
   font-family:monospace;
 }
 
-.footer{
+.footer {
   margin-top:20px;
-  font-size:14px;
-  opacity:0.7;
+  opacity:0.6;
 }
 
-iframe {
-  border-radius:12px;
-}
-
-/* 📈 CHART HEIGHT FIX */
+/* chart */
 .chart-frame {
   width:100%;
   height:420px;
   border:none;
+  border-radius:12px;
 }
 
 </style>
@@ -212,16 +228,16 @@ SY Balance: <span id="balance">-</span>
 
 <div class="accordion-item">
 <div class="accordion-header" onclick="toggle(this)">
-Policy Information <span>+</span>
+Policy Information <span class="accordion-icon">+</span>
 </div>
 <div class="accordion-content">
-Sainty Currency is a decentralized Solana token. Users are responsible for their own wallets and transactions.
+Sainty Currency is a decentralized Solana token.
 </div>
 </div>
 
 <div class="accordion-item">
 <div class="accordion-header" onclick="toggle(this)">
-Address <span>+</span>
+Address <span class="accordion-icon">+</span>
 </div>
 <div class="accordion-content">
 <div class="address">
@@ -235,31 +251,61 @@ Address <span>+</span>
 
 <div class="accordion-item">
 <div class="accordion-header" onclick="toggle(this)">
-What is Sainty Currency? <span>+</span>
+What is Sainty Currency? <span class="accordion-icon">+</span>
+</div>
+<div class="accordion-content">A Solana-based token.</div>
+</div>
+
+<!-- 🧩 PRODUCTS -->
+<h2>PRODUCTS</h2>
+
+<div class="row">
+
+<div class="accordion-item">
+<div class="accordion-header" onclick="toggle(this)">
+Sainty Pay <span class="accordion-icon">+</span>
 </div>
 <div class="accordion-content">
-Sainty Currency (SY) is a Solana-based token.
+<div class="subtle-text">
+Sainty Pay is an upcoming financial ecosystem enabling payments for groceries and daily services using blockchain technology. Built for speed, security, and accessibility. Coming soon.
+</div>
 </div>
 </div>
 
 <div class="accordion-item">
 <div class="accordion-header" onclick="toggle(this)">
-How do I buy SY? <span>+</span>
+Trade Sainty <span class="accordion-icon">+</span>
 </div>
 <div class="accordion-content">
-Click buy and connect Phantom wallet.
+<div class="subtle-text">
+Trade Sainty instantly via Pump.fun.
+<br><br>
+<a href="https://pump.fun/coin/HWGHm23Q6FByrGT4QnVXSAQ9LbJaWnpHaX4XVR6ppump" target="_blank" style="color:white;">
+Open Trading Page →
+</a>
 </div>
 </div>
+</div>
+
+</div>
+
+<!-- 📊 CHART -->
+<h2>MARKET</h2>
 
 <div class="accordion-item">
 <div class="accordion-header" onclick="toggle(this)">
-Is it safe? <span>+</span>
+Token Chart <span class="accordion-icon">+</span>
 </div>
 <div class="accordion-content">
-Transactions are blockchain-based and irreversible.
+<div class="liquid">
+<iframe class="chart-frame"
+src="https://dexscreener.com/solana/HWGHm23Q6FByrGT4QnVXSAQ9LbJaWnpHaX4XVR6ppump?embed=1&theme=dark">
+</iframe>
+</div>
 </div>
 </div>
 
+<!-- 💳 CARD -->
 <h2>Sainty Card</h2>
 
 <div class="liquid">
@@ -268,17 +314,7 @@ Transactions are blockchain-based and irreversible.
 <button onclick="join()">Join Waitlist</button>
 </div>
 
-<h2>CHART</h2>
-
-<div class="liquid">
-  <iframe 
-    class="chart-frame"
-    src="https://dexscreener.com/solana/HWGHm23Q6FByrGT4QnVXSAQ9LbJaWnpHaX4XVR6ppump?embed=1&theme=dark">
-  </iframe>
-</div>
-
 <div class="footer">
-<p>Policy: SaintyCurrency (SC) is a decentralized digital token designed to function as a medium of exchange for goods and services within participating platforms, merchants, and peer-to-peer transactions..</p>
 <p>© Sainty 2026</p>
 </div>
 
@@ -292,29 +328,19 @@ const MINT = new PublicKey("HWGHm23Q6FByrGT4QnVXSAQ9LbJaWnpHaX4XVR6ppump");
 
 let wallet=null;
 
-/* 🔌 WALLET */
 async function getProvider(){
-  if("solana" in window){
-    const provider=window.solana;
-    if(provider.isPhantom) return provider;
-  }
+  if("solana" in window && window.solana.isPhantom) return window.solana;
   alert("Install Phantom Wallet");
-  return null;
 }
 
 async function connect(){
   const provider=await getProvider();
   if(!provider) return false;
-  try{
-    const res=await provider.connect();
-    wallet=res.publicKey;
-    document.getElementById("walletStatus").innerText=wallet.toString();
-    getBalance();
-    return true;
-  }catch{
-    alert("Connection failed");
-    return false;
-  }
+  const res=await provider.connect();
+  wallet=res.publicKey;
+  document.getElementById("walletStatus").innerText=wallet.toString();
+  getBalance();
+  return true;
 }
 
 async function getBalance(){
@@ -328,14 +354,18 @@ async function getBalance(){
   document.getElementById("balance").innerText=bal.toString();
 }
 
-/* ACTIONS */
-async function buy(){ if(await connect()) alert("Buy via Jupiter soon"); }
-async function sell(){ if(await connect()) alert("Sell soon"); }
-async function send(){ if(await connect()) alert("Send soon"); }
+async function buy(){ if(await connect()) alert("Coming soon"); }
+async function sell(){ if(await connect()) alert("Coming soon"); }
+async function send(){ if(await connect()) alert("Coming soon"); }
 async function receive(){ if(await connect()) alert(wallet.toString()); }
 
-/* UI */
-function toggle(el){ el.parentElement.classList.toggle("active"); }
+function toggle(el){
+  const item = el.parentElement;
+  const icon = el.querySelector(".accordion-icon");
+
+  item.classList.toggle("active");
+  icon.textContent = item.classList.contains("active") ? "×" : "+";
+}
 
 function copy(){
   navigator.clipboard.writeText(document.getElementById("addr").innerText);
@@ -348,15 +378,11 @@ function join(){
   alert("Joined: "+email);
 }
 
-/* 🚀 LOADER EXIT */
 window.addEventListener("load", () => {
-  const loader = document.getElementById("loader");
-  const container = document.querySelector(".container");
-
-  setTimeout(() => {
-    loader.classList.add("hidden");
-    container.classList.add("show");
-  }, 3000);
+  setTimeout(()=>{
+    document.getElementById("loader").classList.add("hidden");
+    document.querySelector(".container").classList.add("show");
+  },3000);
 });
 
 </script>
