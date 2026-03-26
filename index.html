@@ -12,27 +12,71 @@
 <script src="https://unpkg.com/@solana/spl-token@latest/lib/index.iife.min.js"></script>
 
 <style>
+
+/* 🌌 GLOBAL */
 body {
   margin:0;
   font-family:"Patrick Hand", cursive;
-  background:
-    linear-gradient(135deg,#d0d0d0,#9e9e9e,#7a7a7a),
-    url("https://www.transparenttextures.com/patterns/asfalt-light.png");
-  background-size:200% 200%, auto;
-  animation:bgMove 60s linear infinite;
+  background: url("background.gif") no-repeat center center fixed;
+  background-size: cover;
+  color:white;
 }
 
-@keyframes bgMove {
-  0%{background-position:0% 0%;}
-  50%{background-position:100% 50%;}
-  100%{background-position:0% 100%;}
+/* 🔮 FULLSCREEN LOADER */
+#loader {
+  position:fixed;
+  top:0;
+  left:0;
+  width:100vw;
+  height:100vh;
+  background:white;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  z-index:999999;
+  transition:opacity 0.8s ease, visibility 0.8s;
 }
 
+#loader.hidden {
+  opacity:0;
+  visibility:hidden;
+}
+
+.loader-logo {
+  width:130px;
+  animation:pulse 2s infinite ease-in-out;
+}
+
+.loader-text {
+  margin-top:15px;
+  font-size:20px;
+  color:black;
+  letter-spacing:2px;
+}
+
+/* glow animation */
+@keyframes pulse {
+  0% { transform:scale(1); filter:drop-shadow(0 0 0px #000); }
+  50% { transform:scale(1.1); filter:drop-shadow(0 0 25px #888); }
+  100% { transform:scale(1); filter:drop-shadow(0 0 0px #000); }
+}
+
+/* 📦 MAIN UI */
 .container {
   width:95%;
   max-width:500px;
   margin:30px auto;
   padding:20px;
+  opacity:0;
+  transform:translateY(20px);
+  transition:all 1s ease;
+  backdrop-filter:blur(12px);
+}
+
+.container.show {
+  opacity:1;
+  transform:translateY(0);
 }
 
 .logo {
@@ -62,19 +106,13 @@ body {
 h2 {
   font-size:28px;
   margin-top:40px;
-  font-weight:bold;
 }
 
 .accordion-header {
   display:flex;
   justify-content:space-between;
   cursor:pointer;
-  font-weight:bold;
 }
-.accordion-icon{ font-size:22px; }
-.accordion-item.active .plus{ display:none; }
-.accordion-item .minus{ display:none; }
-.accordion-item.active .minus{ display:inline; }
 
 .accordion-content{
   max-height:0;
@@ -82,6 +120,7 @@ h2 {
   opacity:0;
   transition:0.3s;
 }
+
 .accordion-item.active .accordion-content{
   max-height:500px;
   opacity:1;
@@ -89,10 +128,10 @@ h2 {
 }
 
 .liquid {
-  background:rgba(255,255,255,0.2);
-  backdrop-filter:blur(20px);
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(25px);
   padding:15px;
-  border-radius:15px;
+  border-radius:18px;
   margin-top:10px;
 }
 
@@ -108,8 +147,8 @@ button{
   width:100%;
   padding:10px;
   margin-top:10px;
-  background:black;
-  color:white;
+  background:white;
+  color:black;
   border:none;
   border-radius:8px;
   cursor:pointer;
@@ -118,7 +157,7 @@ button{
 .address {
   display:flex;
   justify-content:space-between;
-  background:rgba(255,255,255,0.2);
+  background:rgba(255,255,255,0.1);
   padding:10px;
   border-radius:10px;
   font-family:monospace;
@@ -127,12 +166,30 @@ button{
 .footer{
   margin-top:20px;
   font-size:14px;
-  opacity:0.5;
+  opacity:0.7;
 }
+
+iframe {
+  border-radius:12px;
+}
+
+/* 📈 CHART HEIGHT FIX */
+.chart-frame {
+  width:100%;
+  height:420px;
+  border:none;
+}
+
 </style>
 </head>
 
 <body>
+
+<!-- 🔮 LOADER -->
+<div id="loader">
+  <img src="logo.png" class="loader-logo">
+  <div class="loader-text">Connecting to Solana...</div>
+</div>
 
 <div class="container">
 
@@ -155,8 +212,7 @@ SY Balance: <span id="balance">-</span>
 
 <div class="accordion-item">
 <div class="accordion-header" onclick="toggle(this)">
-Policy Information
-<span><span class="plus">+</span><span class="minus">-</span></span>
+Policy Information <span>+</span>
 </div>
 <div class="accordion-content">
 Sainty Currency is a decentralized Solana token. Users are responsible for their own wallets and transactions.
@@ -165,8 +221,7 @@ Sainty Currency is a decentralized Solana token. Users are responsible for their
 
 <div class="accordion-item">
 <div class="accordion-header" onclick="toggle(this)">
-Address
-<span><span class="plus">+</span><span class="minus">-</span></span>
+Address <span>+</span>
 </div>
 <div class="accordion-content">
 <div class="address">
@@ -180,57 +235,64 @@ Address
 
 <div class="accordion-item">
 <div class="accordion-header" onclick="toggle(this)">
-What is Sainty Currency?
-<span><span class="plus">+</span><span class="minus">-</span></span>
+What is Sainty Currency? <span>+</span>
 </div>
 <div class="accordion-content">
-Sainty Currency (SY) is a Solana-based token designed for fast, secure digital transactions.
+Sainty Currency (SY) is a Solana-based token.
 </div>
 </div>
 
 <div class="accordion-item">
 <div class="accordion-header" onclick="toggle(this)">
-How do I buy SY?
-<span><span class="plus">+</span><span class="minus">-</span></span>
+How do I buy SY? <span>+</span>
 </div>
 <div class="accordion-content">
-Click buy, connect your Phantom wallet, and swap SOL for SY.
+Click buy and connect Phantom wallet.
 </div>
 </div>
 
 <div class="accordion-item">
 <div class="accordion-header" onclick="toggle(this)">
-Is it safe?
-<span><span class="plus">+</span><span class="minus">-</span></span>
+Is it safe? <span>+</span>
 </div>
 <div class="accordion-content">
-Transactions happen on the blockchain, meaning they are transparent and irreversible. Always protect your wallet.
+Transactions are blockchain-based and irreversible.
 </div>
 </div>
 
 <h2>Sainty Card</h2>
 
 <div class="liquid">
-<img src="card.png" style="width:180px; display:block; margin:auto; border-radius:12px;">
+<img src="card.png" style="width:260px; display:block; margin:auto; border-radius:16px;">
 <input type="email" id="email" placeholder="Enter your email">
 <button onclick="join()">Join Waitlist</button>
 </div>
 
+<h2>CHART</h2>
+
+<div class="liquid">
+  <iframe 
+    class="chart-frame"
+    src="https://dexscreener.com/solana/HWGHm23Q6FByrGT4QnVXSAQ9LbJaWnpHaX4XVR6ppump?embed=1&theme=dark">
+  </iframe>
+</div>
+
 <div class="footer">
-<p>Policy: SaintyCurrency (SAINTY) is a decentralized digital token designed to function as a medium of exchange for goods and services within participating platforms, merchants, and peer-to-peer transactions..</p>
+<p>Policy: Informational use only.</p>
 <p>© Sainty 2026</p>
 </div>
 
 </div>
 
 <script>
+
 const {Connection, PublicKey, clusterApiUrl} = solanaWeb3;
 const connection = new Connection(clusterApiUrl("mainnet-beta"));
 const MINT = new PublicKey("HWGHm23Q6FByrGT4QnVXSAQ9LbJaWnpHaX4XVR6ppump");
 
 let wallet=null;
 
-// detect phantom
+/* 🔌 WALLET */
 async function getProvider(){
   if("solana" in window){
     const provider=window.solana;
@@ -240,7 +302,6 @@ async function getProvider(){
   return null;
 }
 
-// connect wallet
 async function connect(){
   const provider=await getProvider();
   if(!provider) return false;
@@ -256,7 +317,6 @@ async function connect(){
   }
 }
 
-// get SY balance
 async function getBalance(){
   const accs=await connection.getTokenAccountsByOwner(wallet,{mint:MINT});
   let bal=0;
@@ -268,23 +328,37 @@ async function getBalance(){
   document.getElementById("balance").innerText=bal.toString();
 }
 
-// actions
-async function buy(){ if(await connect()) alert("Buy via Jupiter coming"); }
-async function sell(){ if(await connect()) alert("Sell coming"); }
-async function send(){ if(await connect()) alert("Send coming"); }
+/* ACTIONS */
+async function buy(){ if(await connect()) alert("Buy via Jupiter soon"); }
+async function sell(){ if(await connect()) alert("Sell soon"); }
+async function send(){ if(await connect()) alert("Send soon"); }
 async function receive(){ if(await connect()) alert(wallet.toString()); }
 
-// ui
+/* UI */
 function toggle(el){ el.parentElement.classList.toggle("active"); }
+
 function copy(){
   navigator.clipboard.writeText(document.getElementById("addr").innerText);
   alert("Copied");
 }
+
 function join(){
   const email=document.getElementById("email").value;
   if(!email) return alert("Enter email");
   alert("Joined: "+email);
 }
+
+/* 🚀 LOADER EXIT */
+window.addEventListener("load", () => {
+  const loader = document.getElementById("loader");
+  const container = document.querySelector(".container");
+
+  setTimeout(() => {
+    loader.classList.add("hidden");
+    container.classList.add("show");
+  }, 3000);
+});
+
 </script>
 
 </body>
