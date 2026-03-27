@@ -201,7 +201,6 @@ button {
 
 <body>
 
-<!-- 🔮 LOADER -->
 <div id="loader">
   <img src="logo.png" class="loader-logo">
   <div class="loader-text">Connecting to Solana...</div>
@@ -256,7 +255,6 @@ What is Sainty Currency? <span class="accordion-icon">+</span>
 <div class="accordion-content">A Solana-based token.</div>
 </div>
 
-<!-- 🧩 PRODUCTS -->
 <h2>PRODUCTS</h2>
 
 <div class="row">
@@ -267,7 +265,7 @@ Sainty Pay <span class="accordion-icon">+</span>
 </div>
 <div class="accordion-content">
 <div class="subtle-text">
-Sainty Pay is an upcoming financial ecosystem enabling payments for groceries and daily services using blockchain technology. Built for speed, security, and accessibility. Coming soon.
+Sainty Pay is an upcoming financial ecosystem enabling payments for groceries and daily services using blockchain technology.
 </div>
 </div>
 </div>
@@ -278,8 +276,6 @@ Trade Sainty <span class="accordion-icon">+</span>
 </div>
 <div class="accordion-content">
 <div class="subtle-text">
-Trade Sainty instantly via Pump.fun.
-<br><br>
 <a href="https://pump.fun/coin/HWGHm23Q6FByrGT4QnVXSAQ9LbJaWnpHaX4XVR6ppump" target="_blank" style="color:white;">
 Open Trading Page →
 </a>
@@ -289,23 +285,6 @@ Open Trading Page →
 
 </div>
 
-<!-- 📊 CHART -->
-<h2>MARKET</h2>
-
-<div class="accordion-item">
-<div class="accordion-header" onclick="toggle(this)">
-Token Chart <span class="accordion-icon">+</span>
-</div>
-<div class="accordion-content">
-<div class="liquid">
-<iframe class="chart-frame"
-src="https://dexscreener.com/solana/HWGHm23Q6FByrGT4QnVXSAQ9LbJaWnpHaX4XVR6ppump?embed=1&theme=dark">
-</iframe>
-</div>
-</div>
-</div>
-
-<!-- 💳 CARD -->
 <h2>Sainty Card</h2>
 
 <div class="liquid">
@@ -326,7 +305,7 @@ const {Connection, PublicKey, clusterApiUrl} = solanaWeb3;
 const connection = new Connection(clusterApiUrl("mainnet-beta"));
 const MINT = new PublicKey("HWGHm23Q6FByrGT4QnVXSAQ9LbJaWnpHaX4XVR6ppump");
 
-let wallet=null;
+let wallet = null;
 
 async function getProvider(){
   if("solana" in window && window.solana.isPhantom) return window.solana;
@@ -334,24 +313,37 @@ async function getProvider(){
 }
 
 async function connect(){
-  const provider=await getProvider();
+  const provider = await getProvider();
   if(!provider) return false;
-  const res=await provider.connect();
-  wallet=res.publicKey;
-  document.getElementById("walletStatus").innerText=wallet.toString();
-  getBalance();
-  return true;
+
+  try{
+    const res = await provider.connect();
+    wallet = res.publicKey;
+    document.getElementById("walletStatus").innerText = wallet.toString();
+    getBalance();
+    return true;
+  }catch{
+    alert("Connection cancelled");
+    return false;
+  }
 }
 
 async function getBalance(){
-  const accs=await connection.getTokenAccountsByOwner(wallet,{mint:MINT});
-  let bal=0;
-  if(accs.value.length){
-    const data=accs.value[0].account.data;
-    const view=new DataView(data.buffer);
-    bal=view.getBigUint64(64,true)/(10n**9n);
+  try{
+    const accs = await connection.getTokenAccountsByOwner(wallet,{mint:MINT});
+    let bal = 0;
+
+    if(accs.value.length){
+      const data = accs.value[0].account.data;
+      const view = new DataView(data.buffer);
+      bal = view.getBigUint64(64,true)/(10n**9n);
+    }
+
+    document.getElementById("balance").innerText = bal.toString();
+
+  }catch{
+    document.getElementById("balance").innerText = "0";
   }
-  document.getElementById("balance").innerText=bal.toString();
 }
 
 async function buy(){ if(await connect()) alert("Coming soon"); }
@@ -362,20 +354,45 @@ async function receive(){ if(await connect()) alert(wallet.toString()); }
 function toggle(el){
   const item = el.parentElement;
   const icon = el.querySelector(".accordion-icon");
-
   item.classList.toggle("active");
   icon.textContent = item.classList.contains("active") ? "×" : "+";
 }
 
 function copy(){
   navigator.clipboard.writeText(document.getElementById("addr").innerText);
-  alert("Copied");
+  alert("Copied to clipboard");
 }
 
-function join(){
-  const email=document.getElementById("email").value;
+/* 💳 WORKING WAITLIST */
+async function join(){
+  const emailInput = document.getElementById("email");
+  const email = emailInput.value.trim();
+
   if(!email) return alert("Enter email");
-  alert("Joined: "+email);
+
+  const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  if(!valid) return alert("Enter a valid email");
+
+  try{
+    const res = await fetch("https://formspree.io/f/mreobdvz", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify({ email })
+    });
+
+    if(res.ok){
+      alert("✅ You're officially on the Sainty Card waitlist.\nWe’ll notify you soon.");
+      emailInput.value = "";
+    } else {
+      alert("Something went wrong");
+    }
+
+  }catch{
+    alert("Network error");
+  }
 }
 
 window.addEventListener("load", () => {
